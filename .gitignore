@@ -1,0 +1,7 @@
+*.o
+*.bin
+*.elf
+*.iso
+*.log
+iso/boot.myos.kernel
+build/
