@@ -1,26 +1,38 @@
 #include "../drivers/vga.h"
+#include "../drivers/keyboard.h"
+#include "gdt.h"
+#include "idt.h"
+#include "isr.h"
+#include "shell.h"
 
 void kernel_main() {
     vga_init();
 
-    /* Print banner in cyan */
     vga_print_color("========================================\n", COLOR_CYAN, COLOR_BLACK);
-    vga_print_color("          Welcome to myOS v0.1          \n", COLOR_CYAN, COLOR_BLACK);
+    vga_print_color("          Welcome to myOS v0.2          \n", COLOR_CYAN, COLOR_BLACK);
     vga_print_color("========================================\n", COLOR_CYAN, COLOR_BLACK);
 
-    /* System info in white */
-    vga_print_color("\n[OK] ", COLOR_GREEN, COLOR_BLACK);
-    vga_print("Kernel loaded successfully\n");
-
+    vga_print_color("\n[BOOT] ", COLOR_CYAN, COLOR_BLACK);
+    vga_print("Initializing GDT...\n");
+    gdt_init();
     vga_print_color("[OK] ", COLOR_GREEN, COLOR_BLACK);
-    vga_print("VGA driver initialized\n");
+    vga_print("GDT loaded\n");
 
+    vga_print_color("[BOOT] ", COLOR_CYAN, COLOR_BLACK);
+    vga_print("Initializing IDT...\n");
+    idt_init();
     vga_print_color("[OK] ", COLOR_GREEN, COLOR_BLACK);
-    vga_print("32-bit Protected Mode active\n");
+    vga_print("IDT loaded\n");
 
-    /* Warning example */
-    vga_print_color("\n[!!] ", COLOR_RED, COLOR_BLACK);
-    vga_print_color("This is myOS - a custom kernel from scratch!\n", COLOR_WHITE, COLOR_BLACK);
+    keyboard_init();
 
-    vga_print_color("\nReady.\n", COLOR_GREY, COLOR_BLACK);
+    __asm__ volatile("sti");
+    vga_print_color("[OK] ", COLOR_GREEN, COLOR_BLACK);
+    vga_print("Interrupts enabled\n");
+
+    vga_print_color("\n========================================\n", COLOR_CYAN, COLOR_BLACK);
+    vga_print_color("       myOS ready! Type 'help'          \n", COLOR_WHITE, COLOR_BLACK);
+    vga_print_color("========================================\n", COLOR_CYAN, COLOR_BLACK);
+
+    shell_init();
 }

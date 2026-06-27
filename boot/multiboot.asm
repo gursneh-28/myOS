@@ -24,7 +24,6 @@ _start:
     mov esp, stack_top
     extern kernel_main
     call kernel_main
-    cli
 .hang:
     hlt
     jmp .hang

@@ -16,6 +16,7 @@ typedef enum {
 
 void vga_init();
 void vga_putchar(char c);
+void vga_backspace();        /* ← add this */
 void vga_print(const char* str);
 void vga_print_color(const char* str, vga_color fg, vga_color bg);
 void vga_clear();

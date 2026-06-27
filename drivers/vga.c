@@ -18,13 +18,11 @@ static unsigned short make_entry(char c, unsigned char color) {
 }
 
 static void scroll() {
-    /* Move every row up by one */
     for (int y = 0; y < VGA_HEIGHT - 1; y++) {
         for (int x = 0; x < VGA_WIDTH; x++) {
             vga[y * VGA_WIDTH + x] = vga[(y + 1) * VGA_WIDTH + x];
         }
     }
-    /* Clear last row */
     for (int x = 0; x < VGA_WIDTH; x++) {
         vga[(VGA_HEIGHT - 1) * VGA_WIDTH + x] = make_entry(' ', current_color);
     }
@@ -58,16 +56,35 @@ void vga_putchar(char c) {
         cursor_x++;
     }
 
-    /* Wrap to next line if needed */
     if (cursor_x >= VGA_WIDTH) {
         cursor_x = 0;
         cursor_y++;
     }
 
-    /* Scroll if we reached bottom */
     if (cursor_y >= VGA_HEIGHT) {
         scroll();
     }
+}
+
+void vga_backspace() {
+    if (cursor_x > 0) {
+        cursor_x--;
+    } else if (cursor_y > 0) {
+        /* Go to end of previous line */
+        cursor_y--;
+        cursor_x = VGA_WIDTH - 1;
+        /* Scan back to find last non-space character */
+        while (cursor_x > 0) {
+            unsigned short entry = vga[cursor_y * VGA_WIDTH + cursor_x];
+            char c = entry & 0xFF;
+            if (c != ' ') break;
+            cursor_x--;
+        }
+        cursor_x++; /* Position after last character */
+        if (cursor_x >= VGA_WIDTH) cursor_x = VGA_WIDTH - 1;
+    }
+    /* Erase the character at cursor */
+    vga[cursor_y * VGA_WIDTH + cursor_x] = make_entry(' ', current_color);
 }
 
 void vga_print(const char* str) {

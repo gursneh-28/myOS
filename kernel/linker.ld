@@ -1,12 +1,10 @@
-/* linker.ld - Tells GCC how to arrange our kernel in memory */
-
 ENTRY(_start)
 
 SECTIONS {
-    . = 1M;             /* Load kernel at 1MB mark */
+    . = 1M;
 
     .text BLOCK(4K) : ALIGN(4K) {
-        *(.multiboot)   /* Multiboot header must be first */
+        *(.multiboot)
         *(.text)
     }
 
@@ -21,5 +19,12 @@ SECTIONS {
     .bss BLOCK(4K) : ALIGN(4K) {
         *(COMMON)
         *(.bss)
+    }
+
+    /DISCARD/ : {
+        *(.note.gnu.build-id)
+        *(.eh_frame)
+        *(.eh_frame_hdr)
+        *(.comment)
     }
 }
