@@ -4,8 +4,10 @@
 #include "idt.h"
 #include "isr.h"
 #include "shell.h"
+#include "pmm.h"
+#include "heap.h"
 
-void kernel_main() {
+void kernel_main(unsigned int* mboot_ptr) {
     vga_init();
 
     vga_print_color("========================================\n", COLOR_CYAN, COLOR_BLACK);
@@ -23,6 +25,14 @@ void kernel_main() {
     idt_init();
     vga_print_color("[OK] ", COLOR_GREEN, COLOR_BLACK);
     vga_print("IDT loaded\n");
+
+    vga_print_color("[BOOT] ", COLOR_CYAN, COLOR_BLACK);
+    vga_print("Initializing PMM...\n");
+    pmm_init(mboot_ptr);
+
+    vga_print_color("[BOOT] ", COLOR_CYAN, COLOR_BLACK);
+    vga_print("Initializing Heap...\n");
+    heap_init();
 
     keyboard_init();
 

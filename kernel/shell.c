@@ -1,5 +1,6 @@
 #include "shell.h"
 #include "../drivers/vga.h"
+#include "../kernel/heap.h"
 
 #define INPUT_BUFFER_SIZE 256
 
@@ -32,6 +33,8 @@ static void cmd_help() {
     vga_print("- Echo text back (e.g. echo hello)\n");
     vga_print_color("  shutdown ", COLOR_GREEN, COLOR_BLACK);
     vga_print("- Power off the system\n");
+    vga_print_color("  meminfo ", COLOR_GREEN, COLOR_BLACK);
+    vga_print("- Show memory usage\n");
 }
 
 static void cmd_clear() {
@@ -55,6 +58,13 @@ static void cmd_shutdown() {
     vga_print_color("\nShutting down myOS...\n", COLOR_RED, COLOR_BLACK);
     /* QEMU/ACPI shutdown via port 0x604 */
     __asm__ volatile("outw %0, %1" : : "a"((unsigned short)0x2000), "Nd"((unsigned short)0x604));
+}
+
+static void cmd_meminfo() {
+    vga_print_color("\n--- Memory Info ---\n", COLOR_CYAN, COLOR_BLACK);
+    vga_print("Free pages : ");
+    // we'll just call heap_dump for now
+    heap_dump();
 }
 
 static void shell_execute() {
@@ -89,7 +99,9 @@ static void shell_execute() {
         cmd_echo(args);
     } else if (str_equals(cmd, "shutdown")) {
         cmd_shutdown();
-    } else {
+    } else if (str_equals(cmd, "meminfo")) {
+    cmd_meminfo();
+    }  else {
         vga_print_color("\nUnknown command: ", COLOR_RED, COLOR_BLACK);
         vga_print(cmd);
         vga_print("\nType 'help' for available commands.\n");

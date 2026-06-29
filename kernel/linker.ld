@@ -21,6 +21,8 @@ SECTIONS {
         *(.bss)
     }
 
+    _kernel_end = .;    /* ← add this */
+
     /DISCARD/ : {
         *(.note.gnu.build-id)
         *(.eh_frame)

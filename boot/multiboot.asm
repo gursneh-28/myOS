@@ -22,6 +22,7 @@ section .text
 global _start
 _start:
     mov esp, stack_top
+    push ebx            ; push multiboot info pointer as argument
     extern kernel_main
     call kernel_main
 .hang:
