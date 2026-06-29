@@ -1,5 +1,6 @@
 #include "../drivers/vga.h"
 #include "../drivers/keyboard.h"
+#include "../drivers/timer.h"
 #include "gdt.h"
 #include "idt.h"
 #include "isr.h"
@@ -39,6 +40,10 @@ void kernel_main(unsigned int* mboot_ptr) {
     __asm__ volatile("sti");
     vga_print_color("[OK] ", COLOR_GREEN, COLOR_BLACK);
     vga_print("Interrupts enabled\n");
+
+    vga_print_color("[BOOT] ", COLOR_CYAN, COLOR_BLACK);
+    vga_print("Initializing Timer...\n");
+    timer_init(100);  /* 100 Hz = ticks every 10ms */
 
     vga_print_color("\n========================================\n", COLOR_CYAN, COLOR_BLACK);
     vga_print_color("       myOS ready! Type 'help'          \n", COLOR_WHITE, COLOR_BLACK);
