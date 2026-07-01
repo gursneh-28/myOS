@@ -4,6 +4,7 @@
 #include "gdt.h"
 #include "idt.h"
 #include "isr.h"
+#include "paging.h"
 #include "shell.h"
 #include "pmm.h"
 #include "heap.h"
@@ -32,6 +33,10 @@ void kernel_main(unsigned int* mboot_ptr) {
     pmm_init(mboot_ptr);
 
     vga_print_color("[BOOT] ", COLOR_CYAN, COLOR_BLACK);
+    vga_print("Initializing Paging...\n");
+    paging_init();
+
+    vga_print_color("[BOOT] ", COLOR_CYAN, COLOR_BLACK);
     vga_print("Initializing Heap...\n");
     heap_init();
 
@@ -43,7 +48,7 @@ void kernel_main(unsigned int* mboot_ptr) {
 
     vga_print_color("[BOOT] ", COLOR_CYAN, COLOR_BLACK);
     vga_print("Initializing Timer...\n");
-    timer_init(100);  /* 100 Hz = ticks every 10ms */
+    timer_init(100);
 
     vga_print_color("\n========================================\n", COLOR_CYAN, COLOR_BLACK);
     vga_print_color("       myOS ready! Type 'help'          \n", COLOR_WHITE, COLOR_BLACK);

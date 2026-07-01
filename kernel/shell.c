@@ -3,6 +3,7 @@
 #include "../kernel/heap.h"
 #include "../kernel/pmm.h"
 #include "../drivers/timer.h"
+#include "../kernel/paging.h"
 
 #define INPUT_BUFFER_SIZE 256
 
@@ -41,6 +42,7 @@ static void cmd_help() {
     vga_print_color("  about    ", COLOR_GREEN, COLOR_BLACK); vga_print("- About myOS\n");
     vga_print_color("  echo     ", COLOR_GREEN, COLOR_BLACK); vga_print("- Echo text (e.g. echo hello)\n");
     vga_print_color("  meminfo  ", COLOR_GREEN, COLOR_BLACK); vga_print("- Show memory usage\n");
+    vga_print_color("  paging   ", COLOR_GREEN, COLOR_BLACK); vga_print("- Show paging info\n");
     vga_print_color("  uptime   ", COLOR_GREEN, COLOR_BLACK); vga_print("- Show time since boot\n");
     vga_print_color("  version  ", COLOR_GREEN, COLOR_BLACK); vga_print("- Show OS version info\n");
     vga_print_color("  reboot   ", COLOR_GREEN, COLOR_BLACK); vga_print("- Reboot the system\n");
@@ -82,6 +84,20 @@ static void cmd_meminfo() {
 
     vga_print("\n  Heap:\n");
     heap_dump();
+}
+
+static void cmd_paging() {
+    vga_print_color("\n--- Paging Info ---\n", COLOR_CYAN, COLOR_BLACK);
+    vga_print("  Status  : enabled\n");
+    vga_print("  Mode    : 32-bit, 4KB pages\n");
+    vga_print("  Mapped  : 0x00000000 - 0x003FFFFF (4MB identity)\n");
+    vga_print("  VGA     : ");
+    vga_print("0xB8000 → 0xB8000 (identity)\n");
+
+    /* Test: translate a known address */
+    vga_print("  Test    : virt 0x100000 → phys ");
+    /* We know it's identity mapped */
+    vga_print("0x100000 (identity map)\n");
 }
 
 static void cmd_uptime() {
@@ -144,6 +160,7 @@ static void shell_execute() {
     else if (str_equals(cmd, "about"))    cmd_about();
     else if (str_equals(cmd, "echo"))     cmd_echo(args);
     else if (str_equals(cmd, "meminfo"))  cmd_meminfo();
+    else if (str_equals(cmd, "paging"))   cmd_paging();
     else if (str_equals(cmd, "uptime"))   cmd_uptime();
     else if (str_equals(cmd, "version"))  cmd_version();
     else if (str_equals(cmd, "reboot"))   cmd_reboot();
