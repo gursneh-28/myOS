@@ -8,6 +8,30 @@
 #include "shell.h"
 #include "pmm.h"
 #include "heap.h"
+#include "task.h"
+
+/* Demo task A — counts slowly */
+static void task_a() {
+    uint32_t count = 0;
+    while (1) {
+        count++;
+        /* Every 5 million iterations, print something */
+        if (count % 5000000 == 0) {
+            vga_print_color("A", COLOR_MAGENTA, COLOR_BLACK);
+        }
+    }
+}
+
+/* Demo task B */
+static void task_b() {
+    uint32_t count = 0;
+    while (1) {
+        count++;
+        if (count % 5000000 == 0) {
+            vga_print_color("B", COLOR_CYAN, COLOR_BLACK);
+        }
+    }
+}
 
 void kernel_main(unsigned int* mboot_ptr) {
     vga_init();
@@ -49,6 +73,14 @@ void kernel_main(unsigned int* mboot_ptr) {
     vga_print_color("[BOOT] ", COLOR_CYAN, COLOR_BLACK);
     vga_print("Initializing Timer...\n");
     timer_init(100);
+
+    vga_print_color("[BOOT] ", COLOR_CYAN, COLOR_BLACK);
+    vga_print("Initializing Tasking...\n");
+    tasking_init();
+
+    /* Create demo tasks */
+    task_create("task_a", task_a);
+    task_create("task_b", task_b);
 
     vga_print_color("\n========================================\n", COLOR_CYAN, COLOR_BLACK);
     vga_print_color("       myOS ready! Type 'help'          \n", COLOR_WHITE, COLOR_BLACK);

@@ -4,6 +4,7 @@
 #include "../kernel/pmm.h"
 #include "../drivers/timer.h"
 #include "../kernel/paging.h"
+#include "../kernel/task.h"
 
 #define INPUT_BUFFER_SIZE 256
 
@@ -47,6 +48,7 @@ static void cmd_help() {
     vga_print_color("  version  ", COLOR_GREEN, COLOR_BLACK); vga_print("- Show OS version info\n");
     vga_print_color("  reboot   ", COLOR_GREEN, COLOR_BLACK); vga_print("- Reboot the system\n");
     vga_print_color("  shutdown ", COLOR_GREEN, COLOR_BLACK); vga_print("- Power off the system\n");
+    vga_print_color("  tasks   ", COLOR_GREEN, COLOR_BLACK); vga_print("- List running tasks\n");
 }
 
 static void cmd_clear() {
@@ -139,6 +141,10 @@ static void cmd_shutdown() {
     __asm__ volatile("outw %0, %1" : : "a"((unsigned short)0x2000), "Nd"((unsigned short)0x604));
 }
 
+static void cmd_tasks() {
+    task_list();
+}
+
 static void shell_execute() {
     input_buffer[input_len] = '\0';
 
@@ -165,6 +171,7 @@ static void shell_execute() {
     else if (str_equals(cmd, "version"))  cmd_version();
     else if (str_equals(cmd, "reboot"))   cmd_reboot();
     else if (str_equals(cmd, "shutdown")) cmd_shutdown();
+    else if (str_equals(cmd, "tasks")) cmd_tasks();
     else {
         vga_print_color("\nUnknown command: ", COLOR_RED, COLOR_BLACK);
         vga_print(cmd);
