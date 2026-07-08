@@ -9,26 +9,32 @@
 #include "pmm.h"
 #include "heap.h"
 #include "task.h"
+#include "syscall.h"
 
-/* Demo task A — counts slowly */
 static void task_a() {
     uint32_t count = 0;
     while (1) {
         count++;
-        /* Every 5 million iterations, print something */
         if (count % 5000000 == 0) {
-            vga_print_color("A", COLOR_MAGENTA, COLOR_BLACK);
+            const char* msg = "A";
+            __asm__ volatile(
+                "int $0x80"
+                : : "a"(0), "b"(msg)
+            );
         }
     }
 }
 
-/* Demo task B */
 static void task_b() {
     uint32_t count = 0;
     while (1) {
         count++;
         if (count % 5000000 == 0) {
-            vga_print_color("B", COLOR_CYAN, COLOR_BLACK);
+            const char* msg = "B";
+            __asm__ volatile(
+                "int $0x80"
+                : : "a"(0), "b"(msg)
+            );
         }
     }
 }
@@ -51,6 +57,10 @@ void kernel_main(unsigned int* mboot_ptr) {
     idt_init();
     vga_print_color("[OK] ", COLOR_GREEN, COLOR_BLACK);
     vga_print("IDT loaded\n");
+
+    vga_print_color("[BOOT] ", COLOR_CYAN, COLOR_BLACK);
+    vga_print("Initializing Syscalls...\n");
+    syscall_init();
 
     vga_print_color("[BOOT] ", COLOR_CYAN, COLOR_BLACK);
     vga_print("Initializing PMM...\n");
@@ -78,7 +88,6 @@ void kernel_main(unsigned int* mboot_ptr) {
     vga_print("Initializing Tasking...\n");
     tasking_init();
 
-    /* Create demo tasks */
     task_create("task_a", task_a);
     task_create("task_b", task_b);
 

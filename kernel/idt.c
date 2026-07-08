@@ -15,6 +15,7 @@ extern void isr6();  extern void isr7();  extern void isr8();
 extern void isr9();  extern void isr10(); extern void isr11();
 extern void isr12(); extern void isr13(); extern void isr14();
 extern void isr15();
+extern void isr128();  /* syscall */
 
 /* IRQ handlers */
 extern void irq0();  extern void irq1();  extern void irq2();
@@ -78,6 +79,7 @@ void idt_init() {
     idt_set_gate(45, (uint32_t)irq13, 0x08, 0x8E);
     idt_set_gate(46, (uint32_t)irq14, 0x08, 0x8E);
     idt_set_gate(47, (uint32_t)irq15, 0x08, 0x8E);
+    idt_set_gate(0x80, (uint32_t)isr128, 0x08, 0xEE);
 
     idt_flush((uint32_t)&ip);
 }

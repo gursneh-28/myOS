@@ -47,6 +47,14 @@ ISR_ERRCODE   13
 ISR_ERRCODE   14
 ISR_NOERRCODE 15
 
+; Syscall (int 0x80) — use dword, 128 doesn't fit in signed byte
+global isr128
+isr128:
+    cli
+    push dword 0
+    push dword 128
+    jmp isr_common_stub
+
 ; Hardware IRQs
 IRQ 0,  32
 IRQ 1,  33
