@@ -57,9 +57,9 @@ void task_exit() {
     if (current_task >= 0) {
         tasks[current_task].state = TASK_DEAD;
         task_count--;
+        current_task = -1;
     }
-    /* Hang — scheduler will skip dead tasks */
-    __asm__ volatile("cli; hlt");
+    /* Return to caller — kernel_main will continue to shell_init */
 }
 
 void task_create(const char* name, void (*entry)()) {

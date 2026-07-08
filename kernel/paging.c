@@ -21,28 +21,19 @@ static void print_hex(uint32_t val) {
 }
 
 void paging_init() {
-    /* Clear page directory — mark all entries not present */
     for (int i = 0; i < 1024; i++) {
-        page_directory[i] = 0x00000002;  /* not present, writable */
+        page_directory[i] = 0x00000002;
     }
 
-    /* Identity map first 4MB:
-       virtual 0x00000000 - 0x003FFFFF → same physical addresses
-       This keeps our kernel code/data working after paging is enabled */
+    /* Identity map first 4MB with USER flag so ring 3 can access it */
     for (int i = 0; i < 1024; i++) {
-        page_table_0[i] = (i * PAGE_SIZE) | PAGE_PRESENT | PAGE_WRITABLE;
+        page_table_0[i] = (i * PAGE_SIZE) | PAGE_PRESENT | PAGE_WRITABLE | PAGE_USER;
     }
 
-    /* Put page_table_0 into slot 0 of page directory */
-    page_directory[0] = (uint32_t)page_table_0 | PAGE_PRESENT | PAGE_WRITABLE;
+    page_directory[0] = (uint32_t)page_table_0 | PAGE_PRESENT | PAGE_WRITABLE | PAGE_USER;
 
-    /* Also map kernel at 1MB+ — our kernel lives at 0x100000
-       which is already covered by the identity map above (first 4MB) */
-
-    /* Load page directory into CR3 */
     __asm__ volatile("mov %0, %%cr3" : : "r"((uint32_t)page_directory));
 
-    /* Enable paging by setting bit 31 of CR0 */
     uint32_t cr0;
     __asm__ volatile("mov %%cr0, %0" : "=r"(cr0));
     cr0 |= 0x80000000;

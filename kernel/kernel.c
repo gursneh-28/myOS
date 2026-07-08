@@ -10,33 +10,17 @@
 #include "heap.h"
 #include "task.h"
 #include "syscall.h"
+#include "usermode.h"
 
-static void task_a() {
-    uint32_t count = 0;
-    while (1) {
-        count++;
-        if (count % 5000000 == 0) {
-            const char* msg = "A";
-            __asm__ volatile(
-                "int $0x80"
-                : : "a"(0), "b"(msg)
-            );
-        }
-    }
-}
+/* Runs in Ring 3 */
+static void user_task() {
+    const char* msg = "\n[Ring 3] Hello from user mode!\n";
+    __asm__ volatile("int $0x80" : : "a"(0), "b"(msg));
 
-static void task_b() {
-    uint32_t count = 0;
-    while (1) {
-        count++;
-        if (count % 5000000 == 0) {
-            const char* msg = "B";
-            __asm__ volatile(
-                "int $0x80"
-                : : "a"(0), "b"(msg)
-            );
-        }
-    }
+    /* Exit via syscall */
+    __asm__ volatile("int $0x80" : : "a"(1));
+
+    while(1);
 }
 
 void kernel_main(unsigned int* mboot_ptr) {
@@ -88,12 +72,13 @@ void kernel_main(unsigned int* mboot_ptr) {
     vga_print("Initializing Tasking...\n");
     tasking_init();
 
-    task_create("task_a", task_a);
-    task_create("task_b", task_b);
-
     vga_print_color("\n========================================\n", COLOR_CYAN, COLOR_BLACK);
     vga_print_color("       myOS ready! Type 'help'          \n", COLOR_WHITE, COLOR_BLACK);
     vga_print_color("========================================\n", COLOR_CYAN, COLOR_BLACK);
 
+    /* Demo: enter user mode, print via syscall, then exit back */
+    enter_usermode(user_task);
+
+    /* After user_task exits via SYS_EXIT, control returns here */
     shell_init();
 }

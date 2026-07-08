@@ -2,21 +2,29 @@
 
 global gdt_flush
 gdt_flush:
-    mov eax, [esp+4]    ; Get pointer to GDT
-    lgdt [eax]          ; Load GDT
+    mov eax, [esp+4]
+    lgdt [eax]
 
-    mov ax, 0x10        ; 0x10 = data segment offset in GDT
+    mov ax, 0x10
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
     mov ss, ax
-    jmp 0x08:.flush     ; 0x08 = code segment, far jump to reload CS
+    jmp 0x08:.flush
 .flush:
     ret
 
 global idt_flush
 idt_flush:
-    mov eax, [esp+4]    ; Get pointer to IDT
-    lidt [eax]          ; Load IDT
+    mov eax, [esp+4]
+    lidt [eax]
     ret
+
+global tss_flush
+tss_flush:
+    mov ax, 0x28
+    ltr ax
+    ret
+
+section .note.GNU-stack noalloc noexec nowrite progbits
