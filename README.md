@@ -48,31 +48,49 @@ no libraries, no shortcuts.
 ---
 
 ## Architecture
+
+```text
 myOS/
 ├── boot/
-│   └── multiboot.asm       # GRUB multiboot entry point
+│   └── multiboot.asm            # GRUB multiboot entry point
+│
 ├── kernel/
-│   ├── kernel.c            # Kernel main, boot sequence
-│   ├── gdt.c / gdt.h       # Global Descriptor Table + TSS
-│   ├── gdt_flush.asm       # lgdt, lidt, ltr instructions
-│   ├── idt.c / idt.h       # Interrupt Descriptor Table
-│   ├── isr.c / isr.h       # ISR/IRQ handlers
-│   ├── isr.asm             # Assembly stubs for interrupts
-│   ├── pmm.c / pmm.h       # Physical Memory Manager
-│   ├── heap.c / heap.h     # Kernel heap allocator
-│   ├── paging.c / paging.h # Virtual memory + page tables
-│   ├── task.c / task.h     # Multitasking + scheduler
-│   ├── syscall.c / syscall.h # Syscall interface
-│   ├── usermode.c          # Ring 3 switch
-│   ├── usermode.asm        # iret-based privilege switch
-│   ├── shell.c / shell.h   # Interactive shell
-│   ├── fs.c / fs.h         # Ramdisk filesystem
-│   ├── elf.c / elf.h       # ELF binary loader
-│   └── linker.ld           # Kernel linker script
+│   ├── kernel.c                 # Kernel main, boot sequence
+│   ├── gdt.c
+│   ├── gdt.h                    # Global Descriptor Table + TSS
+│   ├── gdt_flush.asm            # lgdt, lidt, ltr instructions
+│   ├── idt.c
+│   ├── idt.h                    # Interrupt Descriptor Table
+│   ├── isr.c
+│   ├── isr.h                    # ISR/IRQ handlers
+│   ├── isr.asm                  # Assembly stubs for interrupts
+│   ├── pmm.c
+│   ├── pmm.h                    # Physical Memory Manager
+│   ├── heap.c
+│   ├── heap.h                   # Kernel heap allocator
+│   ├── paging.c
+│   ├── paging.h                 # Virtual memory + page tables
+│   ├── task.c
+│   ├── task.h                   # Multitasking + scheduler
+│   ├── syscall.c
+│   ├── syscall.h                # Syscall interface
+│   ├── usermode.c               # Ring 3 switch
+│   ├── usermode.asm             # iret-based privilege switch
+│   ├── shell.c
+│   ├── shell.h                  # Interactive shell
+│   ├── fs.c
+│   ├── fs.h                     # Ramdisk filesystem
+│   ├── elf.c
+│   ├── elf.h                    # ELF binary loader
+│   └── linker.ld                # Kernel linker script
+│
 └── drivers/
-├── vga.c / vga.h       # VGA text mode driver
-├── keyboard.c / keyboard.h # PS/2 keyboard driver
-└── timer.c / timer.h   # PIT timer driver
+    ├── vga.c
+    ├── vga.h                    # VGA text mode driver
+    ├── keyboard.c
+    ├── keyboard.h               # PS/2 keyboard driver
+    ├── timer.c
+    └── timer.h                  # PIT timer driver
 
 ---
 
@@ -87,7 +105,7 @@ sudo apt install build-essential nasm grub-pc-bin grub-common \
 
 ### Build
 ```bash
-git clone https://github.com/yourusername/myOS
+git clone https://github.com/gursneh-28/myOS.git
 cd myOS
 make
 ```
