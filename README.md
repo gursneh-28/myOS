@@ -8,7 +8,7 @@ no libraries, no shortcuts.
 
 ## Demo
 
-![myOS Boot Screen](docs/screenshot.png)
+![myOS Boot Screen](docs/image.png)
 
 ---
 
