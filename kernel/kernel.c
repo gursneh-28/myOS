@@ -11,6 +11,7 @@
 #include "task.h"
 #include "syscall.h"
 #include "usermode.h"
+#include "fs.h"
 
 /* Runs in Ring 3 */
 static void user_task() {
@@ -57,6 +58,10 @@ void kernel_main(unsigned int* mboot_ptr) {
     vga_print_color("[BOOT] ", COLOR_CYAN, COLOR_BLACK);
     vga_print("Initializing Heap...\n");
     heap_init();
+    
+    vga_print_color("[BOOT] ", COLOR_CYAN, COLOR_BLACK);
+    vga_print("Initializing Filesystem...\n");
+    fs_init();
 
     keyboard_init();
 
