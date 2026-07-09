@@ -48,6 +48,8 @@ void fs_init() {
 
     fs_create("hello.txt", "Hello from the myOS filesystem!\n");
 
+    fs_create_demo_elf();
+
     vga_print_color("[OK] ", COLOR_GREEN, COLOR_BLACK);
     vga_print("Filesystem initialized | ");
     print_int(file_count);
@@ -116,4 +118,79 @@ void fs_list() {
     vga_print("  Total: ");
     print_int(found);
     vga_print(" file(s)\n");
+}
+
+void fs_create_demo_elf() {
+    static uint8_t elf_binary[] = {
+        /* ELF Header (52 bytes) */
+        0x7F,'E','L','F',
+        0x01, 0x01, 0x01, 0x00,
+        0,0,0,0,0,0,0,0,
+        0x02,0x00,
+        0x03,0x00,
+        0x01,0x00,0x00,0x00,
+        0x54,0x00,0x20,0x00,    /* entry = 0x200054 */
+        0x34,0x00,0x00,0x00,
+        0x00,0x00,0x00,0x00,
+        0x00,0x00,0x00,0x00,
+        0x34,0x00,
+        0x20,0x00,
+        0x01,0x00,
+        0x00,0x00,
+        0x00,0x00,
+        0x00,0x00,
+
+        /* Program Header (32 bytes) */
+        0x01,0x00,0x00,0x00,
+        0x00,0x00,0x00,0x00,
+        0x00,0x00,0x20,0x00,    /* vaddr = 0x200000 */
+        0x00,0x00,0x20,0x00,
+        0x90,0x00,0x00,0x00,    /* file_size = 144 */
+        0x90,0x00,0x00,0x00,    /* mem_size  = 144 */
+        0x05,0x00,0x00,0x00,
+        0x00,0x10,0x00,0x00,
+
+        /* Code at 0x200054:
+           mov eax, 0          ; SYS_PRINT
+           mov ebx, 0x200068   ; message address
+           int 0x80            ; syscall
+           ret                 ; return to elf_load() */
+        0xB8,0x00,0x00,0x00,0x00,   /* mov eax, 0  */
+        0xBB,0x68,0x00,0x20,0x00,   /* mov ebx, 0x200068 */
+        0xCD,0x80,                   /* int 0x80 */
+        0xC3,                        /* ret  ← just return! */
+
+        /* Message at 0x200068 */
+        '[','E','L','F',']',' ',
+        'H','e','l','l','o',' ',
+        'f','r','o','m',' ',
+        'a',' ','u','s','e','r',' ',
+        'p','r','o','g','r','a','m','!',
+        '\n','\0',
+
+        /* Padding to 144 bytes */
+        0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,0,0,0
+    };
+
+    for (int i = 0; i < MAX_FILES; i++) {
+        if (!files[i].used) {
+            files[i].name[0]='h'; files[i].name[1]='e';
+            files[i].name[2]='l'; files[i].name[3]='l';
+            files[i].name[4]='o'; files[i].name[5]='.';
+            files[i].name[6]='e'; files[i].name[7]='l';
+            files[i].name[8]='f'; files[i].name[9]='\0';
+
+            uint32_t sz = sizeof(elf_binary);
+            if (sz > MAX_FILESIZE) sz = MAX_FILESIZE;
+            for (uint32_t j = 0; j < sz; j++)
+                files[i].data[j] = elf_binary[j];
+            files[i].size = sz;
+            files[i].used = 1;
+            file_count++;
+            break;
+        }
+    }
 }

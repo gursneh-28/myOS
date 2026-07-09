@@ -6,6 +6,7 @@
 #include "../kernel/paging.h"
 #include "../kernel/task.h"
 #include "../kernel/fs.h"
+#include "../kernel/elf.h"
 
 /* Command history */
 #define HISTORY_SIZE 8
@@ -52,6 +53,7 @@ static void cmd_help() {
     vga_print_color("  cat      ", COLOR_GREEN, COLOR_BLACK); vga_print("- Print file (e.g. cat readme.txt)\n");
     vga_print_color("  write    ", COLOR_GREEN, COLOR_BLACK); vga_print("- Create file (e.g. write name.txt content)\n");
     vga_print_color("  rm       ", COLOR_GREEN, COLOR_BLACK); vga_print("- Delete file (e.g. rm name.txt)\n");
+    vga_print_color("  run      ", COLOR_GREEN, COLOR_BLACK); vga_print("- Run ELF program (e.g. run hello.elf)\n");
 }
 
 static void cmd_clear() { vga_clear(); }
@@ -197,6 +199,14 @@ static void cmd_rm(const char* filename) {
     }
 }
 
+static void cmd_run(const char* filename) {
+    if (!filename || filename[0] == '\0') {
+        vga_print_color("\nUsage: run <filename>\n", COLOR_RED, COLOR_BLACK);
+        return;
+    }
+    elf_load(filename);
+}
+
 static void history_push(const char* cmd) {
     if (cmd[0] == '\0') return;
     /* Shift history down */
@@ -282,6 +292,7 @@ static void shell_execute() {
     else if (str_equals(cmd, "cat"))      cmd_cat(args);
     else if (str_equals(cmd, "write"))    cmd_write(args);
     else if (str_equals(cmd, "rm"))       cmd_rm(args);
+    else if (str_equals(cmd, "run")) cmd_run(args);
     else {
         vga_print_color("\nUnknown command: ", COLOR_RED, COLOR_BLACK);
         vga_print(cmd);

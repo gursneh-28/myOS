@@ -19,5 +19,6 @@ int      fs_create(const char* name, const char* data);
 struct file* fs_open(const char* name);
 void     fs_list();
 int      fs_delete(const char* name);
+void fs_create_demo_elf();
 
 #endif

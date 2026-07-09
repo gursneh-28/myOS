@@ -24,8 +24,10 @@ void syscall_dispatch(struct registers* r) {
             break;
         }
         case SYS_EXIT: {
-            task_exit();
-            break;
+            if (task_is_running()) {
+                task_exit();
+            }
+            return;  /* return to elf_load caller */
         }
         case SYS_GETPID: {
             r->eax = 0;

@@ -163,3 +163,7 @@ void task_list() {
     }
     vga_print_color("-----------------\n", COLOR_CYAN, COLOR_BLACK);
 }
+
+int task_is_running() {
+    return current_task >= 0 && task_count > 0;
+}

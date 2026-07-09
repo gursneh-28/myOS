@@ -27,5 +27,6 @@ void task_exit();
 void schedule(struct registers* r);
 int tasking_ready();
 void task_list();
+int task_is_running();
 
 #endif
